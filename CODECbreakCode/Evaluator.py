@@ -1,0 +1,282 @@
+##The function that mearsure the file and its codec counterpart, let us say we had "a.wav" we compre "a.wav" and "a.64kbps.wav"
+import re
+import os
+import subprocess
+import platform
+from pathlib import Path
+
+from encodec import EncodecModel
+from encodec.utils import convert_audio,save_audio
+import torchaudio
+import torch
+
+#import wave
+def MeasurePEAQOutputsVsRefencefile(FilePath,bitrate,RefFile):
+    '''The function is used to measure the PEAQ score of the file and its codec counterpart.
+    The function takes three arguments, the first argument is the file path of the file to be measured, 
+    the second argument is the bitrate of the codec, and the third argument is the reference file path.
+    The function returns the PEAQ score of the file and its codec counterpart.
+    
+    The function uses the lame codec to encode the file and the peaq to measure the PEAQ score.
+    So, the FilePath is the file in the WAV format, the bitrate is the bitrate of the codec, 
+    and the RefFile is the reference file in the WAV format as well.'''
+
+    command_out = os.popen("sh /home/codecrack/Jnotebook/CODECbreakCode/Audio_Lame_Peaq_VSRef.sh -a %s -b %s -r %s" %(FilePath,bitrate,RefFile)).read()
+    match = re.search(r'Objective Difference Grade: (-?\d+\.\d+)', command_out)
+    if match:
+        Objective_sccore = match.group(1)
+        #print("Value:",Objective_sccore)
+        return Objective_sccore
+    else:
+        print("Notihing out, possible something wrong in the lame or peaq")
+        return 0.0
+
+def MeasurePEAQOutputwithoutCodec(RefFile, ComFile, Version='basic'):
+    '''The function is used to measure the PEAQ score of the file and its codec counterpart.
+    The function takes two arguments, 
+    the first argument is the reference file path and the second argument is the file path of the file to be measured.'''
+    command_out = os.popen("peaq --%s  %s  %s" % (Version,RefFile, ComFile)).read()
+    match = re.search(r'Objective Difference Grade: (-?\d+\.\d+)', command_out)
+    if match:
+        Objective_sccore = match.group(1)
+        #print("Value:",Objective_sccore)
+        return Objective_sccore
+    else:
+        print("Notihing out, possible something wrong in the lame or peaq")
+        return 0.0
+
+def MeasureNMRDelta(Fold, RefFile, DegFile, bitrate=64):
+    '''The function is used to measure the NMR score between the two wav file NMR score after them benn compressed.
+    A.wav -> a.mp3, B.wav -> b.mp3, then we compare A_NMR = A.wav - a.mp3 and B_NMR = B.wav - b.mp3, then we compare the two NMR scores.'''
+    REF_mp3 = GeneratingMP3RefFile(Fold, RefFile, bitrate)
+    Ref_NMR = extract_total_nmr(Fold+RefFile, REF_mp3)
+    Deg_mp3 = GeneratingMP3RefFile(Fold, DegFile, bitrate)
+    Deg_NMR = extract_total_nmr(Fold+DegFile, Deg_mp3)
+
+    return Ref_NMR,Deg_NMR,Deg_NMR-Ref_NMR
+
+def extract_segmental_nmr(reference_file, test_file):
+    # Construct the GStreamer command
+    command = f"""
+    /usr/bin/gst-launch-1.0 \
+      filesrc location=\"{reference_file}\" ! wavparse ! audioconvert name=refsrc \
+      filesrc location=\"{test_file}\" ! wavparse ! audioconvert name=testsrc \
+      peaq name=peaq advanced=true console-output=true refsrc.src! peaq.ref testsrc.src! peaq.test
+    """
+
+    try:
+        result = subprocess.run(command, shell=True, capture_output=True, text=True, check=True)
+        output = result.stdout + result.stderr
+        # print(output)  # Optional: view full output for debugging
+    except subprocess.CalledProcessError as e:
+        print("Error executing GStreamer pipeline:")
+        print(e.stderr)
+        return None
+
+    # Use a better regex to catch the value
+    match = re.search(r"SegmentalNMRB\s*=\s*([-+]?[0-9]*\.?[0-9]+)", output)
+    if match:
+        segmental_nmr = float(match.group(1))
+        print(f"SegmentalNMRB: {segmental_nmr}")
+        return segmental_nmr
+    else:
+        print("SegmentalNMRB not found in output.")
+        return None
+
+def extract_total_nmr(reference_file, test_file):
+    # Construct the GStreamer command
+    command = f"""
+    /usr/bin/gst-launch-1.0 \
+      filesrc location=\"{reference_file}\" ! wavparse ! audioconvert name=refsrc \
+      filesrc location=\"{test_file}\" ! wavparse ! audioconvert name=testsrc \
+      peaq name=peaq refsrc.src\!peaq.ref testsrc.src\!peaq.test
+    """
+
+    try:
+        result = subprocess.run(command, shell=True, capture_output=True, text=True, check=True)
+        output = result.stdout + result.stderr
+#        print(output)  # Optional: view full output for debugging
+    except subprocess.CalledProcessError as e:
+        print("Error executing GStreamer pipeline:")
+        print(e.stderr)
+        return None
+
+    # Use a better regex to catch the value
+    match = re.search(r"Total NMRB:\s*([-+]?[0-9]*\.?[0-9]+)", output)
+    if match:
+        total_nmr = float(match.group(1))
+        #print(f"TotalNMRB: {total_nmr}")
+        return total_nmr
+    else:
+        print("TotalNMRB not found in output.")
+        return None   
+
+def NeuralCodecCompress(FilePath, bitrate=24):
+    Opt_fold = Path(FilePath).resolve().parent.parent
+    # print(f"Opt_fold: {Opt_fold}")
+    GeneratingFold = Opt_fold / 'Mixing_Result_NeuralCodec_Wav/'
+    if not os.path.exists(GeneratingFold):
+        os.makedirs(GeneratingFold)
+    NCWavFileName = Path(FilePath).stem +"_"+str(bitrate)+"kbps.wav"
+    NCWavFile = GeneratingFold / NCWavFileName
+
+
+    model = EncodecModel.encodec_model_48khz()
+    model.set_target_bandwidth(24.)
+    wav, sr = torchaudio.load(FilePath)
+    if wav.shape[1] == 1:  # If mono
+        wav = wav.repeat(1, 2, 1)
+    wav = convert_audio(wav, sr, model.sample_rate, model.channels)
+    wav = wav.unsqueeze(0)  # Add batch dimension: [1, channels, time]
+
+    with torch.no_grad():
+        encoded_frames = model.encode(wav)
+
+    # Decode
+    with torch.no_grad():
+        decoded_wav = model.decode(encoded_frames)
+
+    # print(f"Decoded audio: {decoded_wav.shape}")
+
+    # Convert to mono AFTER decoding
+    decoded_wav = decoded_wav.squeeze(0)  # Remove batch dimension: [channels, time]
+
+    if decoded_wav.shape[0] > 1:  # If stereo/multi-channel
+        mono_wav_l = decoded_wav[0:1, :]  # [1, time]
+        torchaudio.save("premixing_lm_left.wav", mono_wav_l, model.sample_rate)
+    else:
+        raise ValueError("mono_method not working")
+    
+    save_audio(mono_wav_l,NCWavFile,model.sample_rate)
+    return NCWavFile
+
+
+def AacLameLossyCompress(FilePath, bitrate, wrapper = "./Audio_AacCompress.sh"):
+    """
+    Compresses the file using LAME + FFmpeg.
+    On Linux, calls the .sh wrapper.
+    On Windows, calls the .bat wrapper.
+    Returns the decoded WAV path as parsed from the script’s output.
+    """
+    # 1) Decide which wrapper to call
+    Opt_fold = Path(__file__).resolve().parent
+    # print (f"Opt_fold: {Opt_fold}")
+    system = platform.system()
+    if system == "Windows":
+        # note: use raw string or escape backslashes
+        #wrapper = r"D:\Xie\CodecBreaker\CodecBreakerwithRL\CODECbreakCode\Audio_LameCompress.bat"
+        wrapper = str(Opt_fold / "Audio_AacCompress.bat")
+        # on Windows you don’t need “sh”
+        cmd = f'"{wrapper}" -a "{FilePath}" -b {bitrate}'
+    else:
+        # assume linux/unix
+        #wrapper = "/home/codecrack/Jnotebook/CODECbreakCode/Audio_AacCompress.sh"
+        wrapper = str(Opt_fold / "Audio_AacCompress.sh")
+        cmd = f'sh "{wrapper}" -a "{FilePath}" -b {bitrate}'
+
+    # 2) Run the command
+    try:
+        # Using subprocess.check_output is a bit more robust than os.popen
+        command_out = subprocess.check_output(
+            cmd, shell=True, stderr=subprocess.STDOUT, text=True
+        )
+    except subprocess.CalledProcessError as e:
+        # You’ll get e.output with any error text
+        print("Compression failed:")
+        print(e.output)
+        return None
+    
+    # 3) Extract the final WAV path
+    m = re.search(r"outputAACtoWavfilepath=\s*(\S+)\s+by FFMPEG", command_out)
+    if m:
+        return m.group(1)
+    else:
+        print("Could not find output path in script output:")
+        print(command_out)
+        return None
+
+def Mp3LameLossyCompress(FilePath, bitrate, wrapper = "./Audio_LameCompress.sh"):
+    """
+    Compresses the file using LAME + FFmpeg.
+    On Linux, calls the .sh wrapper.
+    On Windows, calls the .bat wrapper.
+    Returns the decoded WAV path as parsed from the script’s output.
+    """
+    # 1) Decide which wrapper to call
+    Opt_fold = Path(__file__).resolve().parent
+    # print (f"Opt_fold: {Opt_fold}")
+    system = platform.system()
+    if system == "Windows":
+        # note: use raw string or escape backslashes
+        # wrapper = r"D:\Xie\CodecBreaker\CodecBreakerwithRL\CODECbreakCode\Audio_LameCompress.bat"
+        wrapper = str(Opt_fold / "Audio_LameCompress.bat")
+        # on Windows you don’t need “sh”
+        cmd = f'"{wrapper}" -a "{FilePath}" -b {bitrate}'
+    else:
+        # assume linux/unix
+        # wrapper = "/home/codecrack/Jnotebook/CODECbreakCode/Audio_LameCompress.sh"
+        wrapper = str(Opt_fold / "Audio_LameCompress.sh")
+        cmd = f'sh "{wrapper}" -a "{FilePath}" -b {bitrate}'
+
+    # 2) Run the command
+    try:
+        # Using subprocess.check_output is a bit more robust than os.popen
+        command_out = subprocess.check_output(
+            cmd, shell=True, stderr=subprocess.STDOUT, text=True
+        )
+    except subprocess.CalledProcessError as e:
+        # You’ll get e.output with any error text
+        print("Compression failed:")
+        print(e.output)
+        return None
+
+    # 3) Extract the final WAV path
+    m = re.search(r"outputMp3toWavfilepath=\s*(\S+)\s+by FFMPEG", command_out)
+    if m:
+        return m.group(1)
+    else:
+        print("Could not find output path in script output:")
+        print(command_out)
+        return None
+
+def GeneratingMP3RefFile(fold, filepath, bitrate): 
+    GeneratingMP3Fold = fold + 'Mixing_Result_Mp3/'
+    if not os.path.exists(GeneratingMP3Fold):
+        os.makedirs(GeneratingMP3Fold)
+    RefMP3FileName = Path(filepath).stem+"_"+str(bitrate)+"kbps.mp3"
+    RefMP3File = GeneratingMP3Fold+RefMP3FileName
+    subprocess.call("lame --silent --noreplaygain -b %s %s %s" % (bitrate,fold+filepath,RefMP3File),shell=True)
+    GeneratingFold = fold + 'Mixing_Result_Mp3_Wav/'
+    if not os.path.exists(GeneratingFold):
+        os.makedirs(GeneratingFold)
+    MP3WavFileName = Path(filepath).stem +"_"+str(bitrate)+"kbps.wav"
+    MP3WavFile = GeneratingFold+MP3WavFileName
+    #subprocess.call("lame --silent --noreplaygain --decode %s %s" % (RefMP3File,MP3WavFile),shell=True)
+    subprocess.call("ffmpeg -i %s -acodec pcm_s16le -ar 48000 -y -loglevel error %s" % (RefMP3File,MP3WavFile),shell=True)
+    #ffmpeg -i $outputMp3filepath -acodec pcm_s"$bitdepth"le -ar $srrate -y -loglevel error $outputMp3toWavfilepath
+    return MP3WavFile
+
+
+import numpy as np
+import clarity
+import clarity.evaluator.haaqi as haaqi
+import librosa
+
+from clarity.utils.audiogram import Audiogram
+class MeasureHAAQIOutput:
+    '''The HAAQI becasue its with some configurations, it runs as a class to be able to set the configurations'''
+    def __init__(self, ref_audio_path, levels_1 = np.array([0, 0, 0, 0, 0, 0, 0, 0])):
+        '''The function is used to initialize the HAAQI class with the reference audio path and hearing loss levels(No heraring loss).'''
+        self._audiogram_NH_ = Audiogram(levels=levels_1)
+        self._reference_audio_data_, self._srate_ = librosa.load(ref_audio_path, sr=None)
+        
+    def set_reference_audio_data(self, ref_audio_path):
+        '''The function is used to set the reference audio data.'''
+        self._reference_audio_data_, self._srate_ = librosa.load(ref_audio_path, sr=None)
+
+    def MeasureHAQQIOutput(self, com_audio_path):
+        '''The function is used to measure the HAAQI score of the reference file and its codec counterpart.'''
+        com_audio_data, _ = librosa.load(com_audio_path, sr=None)
+        #return round(haaqi.compute_haaqi(com_audio_data, self._reference_audio_data_, self._srate_, self._srate_, self._audiogram_NH_),2)
+        return haaqi.compute_haaqi(com_audio_data, self._reference_audio_data_, self._srate_, self._srate_, self._audiogram_NH_)
+    

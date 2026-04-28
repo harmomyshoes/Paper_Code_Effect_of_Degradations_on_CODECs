@@ -1,0 +1,21 @@
+# Jupyter Notebook specific
+.ipynb_checkpoints/        # Ignore hidden autosave folders
+*/.ipynb_checkpoints/*     # Ensure all subfolder checkpoints are caught
+**/.ipynb_checkpoints/*   # Ensure all subfolder checkpoints are caught
+*-checkpoint.py
+*-checkpoint.ipynb
+
+UnitTest/
+
+# Python specific
+__pycache__/               # Ignore byte-compiled code
+*.py[cod]                  # Compiled Python files
+.venv/                     # Local virtual environments
+.env                       # Files containing secret API keys/passwords
+
+# Data and large files
+*.log                      # Ignore log files
+*.identifier
+*.Identifier
+*.pyc
+data/                      # Often used to ignore large local datasets

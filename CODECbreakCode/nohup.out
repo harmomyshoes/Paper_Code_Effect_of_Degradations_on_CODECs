@@ -1,0 +1,140 @@
+[I 2025-08-11 16:54:53.184 ServerApp] jupyter_lsp | extension was successfully linked.
+[I 2025-08-11 16:54:53.186 ServerApp] jupyter_server_mathjax | extension was successfully linked.
+[I 2025-08-11 16:54:53.188 ServerApp] jupyter_server_terminals | extension was successfully linked.
+[I 2025-08-11 16:54:53.191 ServerApp] jupyterlab | extension was successfully linked.
+[I 2025-08-11 16:54:53.191 ServerApp] jupyterlab_git | extension was successfully linked.
+[I 2025-08-11 16:54:53.191 ServerApp] nbdime | extension was successfully linked.
+[E 2025-08-11 16:54:53.192 JupyterNotebookApp] Exception while loading config file /root/.jupyter/jupyter_notebook_config.py
+    Traceback (most recent call last):
+      File "/root/anaconda3/envs/codecbreak/lib/python3.10/site-packages/traitlets/config/application.py", line 915, in _load_config_files
+        config = loader.load_config()
+      File "/root/anaconda3/envs/codecbreak/lib/python3.10/site-packages/traitlets/config/loader.py", line 622, in load_config
+        self._read_file_as_dict()
+      File "/root/anaconda3/envs/codecbreak/lib/python3.10/site-packages/traitlets/config/loader.py", line 655, in _read_file_as_dict
+        exec(compile(f.read(), conf_filename, "exec"), namespace, namespace)  # noqa: S102
+      File "/root/.jupyter/jupyter_notebook_config.py", line 351
+        c.NotebookApp.ip = '0.0.0.0'
+    IndentationError: unexpected indent
+[W 2025-08-11 16:54:53.194 JupyterNotebookApp] 'password' has moved from NotebookApp to ServerApp. This config will be passed to ServerApp. Be sure to update your config before our next release.
+[W 2025-08-11 16:54:53.196 ServerApp] ServerApp.password config is deprecated in 2.0. Use PasswordIdentityProvider.hashed_password.
+[I 2025-08-11 16:54:53.196 ServerApp] notebook | extension was successfully linked.
+[I 2025-08-11 16:54:53.497 ServerApp] notebook_shim | extension was successfully linked.
+[I 2025-08-11 16:54:53.516 ServerApp] notebook_shim | extension was successfully loaded.
+[I 2025-08-11 16:54:53.517 ServerApp] jupyter_lsp | extension was successfully loaded.
+[I 2025-08-11 16:54:53.518 ServerApp] jupyter_server_mathjax | extension was successfully loaded.
+[I 2025-08-11 16:54:53.518 ServerApp] jupyter_server_terminals | extension was successfully loaded.
+[I 2025-08-11 16:54:53.528 LabApp] JupyterLab extension loaded from /root/anaconda3/envs/codecbreak/lib/python3.10/site-packages/jupyterlab
+[I 2025-08-11 16:54:53.528 LabApp] JupyterLab application directory is /root/anaconda3/envs/codecbreak/share/jupyter/lab
+[I 2025-08-11 16:54:53.528 LabApp] Extension Manager is 'pypi'.
+[I 2025-08-11 16:54:53.570 ServerApp] jupyterlab | extension was successfully loaded.
+[I 2025-08-11 16:54:53.573 ServerApp] jupyterlab_git | extension was successfully loaded.
+[I 2025-08-11 16:54:53.633 ServerApp] nbdime | extension was successfully loaded.
+[I 2025-08-11 16:54:53.635 ServerApp] notebook | extension was successfully loaded.
+[I 2025-08-11 16:54:53.636 ServerApp] Serving notebooks from local directory: /home/codecrack/CodecBreakerwithRL/CODECbreakCode
+[I 2025-08-11 16:54:53.636 ServerApp] Jupyter Server 2.16.0 is running at:
+[I 2025-08-11 16:54:53.636 ServerApp] http://SmallMONSTER:8888/lab
+[I 2025-08-11 16:54:53.636 ServerApp]     http://127.0.0.1:8888/lab
+[I 2025-08-11 16:54:53.636 ServerApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[I 2025-08-11 16:54:54.925 ServerApp] Skipped non-installed server(s): bash-language-server, dockerfile-language-server-nodejs, javascript-typescript-langserver, jedi-language-server, julia-language-server, pyright, python-language-server, python-lsp-server, r-languageserver, sql-language-server, texlab, typescript-language-server, unified-language-server, vscode-css-languageserver-bin, vscode-html-languageserver-bin, vscode-json-languageserver-bin, yaml-language-server
+[E 2025-08-11 16:55:01.704 ServerApp] Uncaught exception GET /lab/api/settings?1754927701515 (127.0.0.1)
+    HTTPServerRequest(protocol='http', host='localhost:8888', method='GET', uri='/lab/api/settings?1754927701515', version='HTTP/1.1', remote_ip='127.0.0.1')
+    Traceback (most recent call last):
+      File "/root/anaconda3/envs/codecbreak/lib/python3.10/site-packages/tornado/web.py", line 1848, in _execute
+        result = await result
+    tornado.iostream.StreamClosedError: Stream is closed
+[W 2025-08-11 16:55:02.429 LabApp] Could not determine jupyterlab build status without nodejs
+[W 2025-08-11 16:55:02.510 ServerApp] 404 GET /api/contents/Test_On_New_MixFun_NeuralCodec.ipynb?content=0&hash=0&1754927702497 (1818c910d95940398bc05336be593dcd@127.0.0.1) 1.16ms referer=http://localhost:8888/lab/tree/Test_On_New_MixFun_NeuralCodec.ipynb
+[W 2025-08-11 16:55:02.511 ServerApp] 404 GET /api/contents/Test_On_New_MixFun_NeuralCodec.ipynb?content=0&hash=0&1754927702497 (127.0.0.1): No such file or directory: Test_On_New_MixFun_NeuralCodec.ipynb
+[W 2025-08-11 16:55:02.513 ServerApp] 404 GET /api/contents/Test_On_New_MixFun_AAC.ipynb?content=0&hash=0&1754927702497 (1818c910d95940398bc05336be593dcd@127.0.0.1) 0.91ms referer=http://localhost:8888/lab/tree/Test_On_New_MixFun_NeuralCodec.ipynb
+[W 2025-08-11 16:55:02.513 ServerApp] 404 GET /api/contents/Test_On_New_MixFun_AAC.ipynb?content=0&hash=0&1754927702497 (127.0.0.1): No such file or directory: Test_On_New_MixFun_AAC.ipynb
+[W 2025-08-11 16:55:02.515 ServerApp] 404 GET /api/contents/Untitled.ipynb?content=0&hash=0&1754927702497 (1818c910d95940398bc05336be593dcd@127.0.0.1) 1.20ms referer=http://localhost:8888/lab/tree/Test_On_New_MixFun_NeuralCodec.ipynb
+[W 2025-08-11 16:55:02.515 ServerApp] 404 GET /api/contents/Untitled.ipynb?content=0&hash=0&1754927702497 (127.0.0.1): No such file or directory: Untitled.ipynb
+[W 2025-08-11 16:55:02.516 ServerApp] 404 GET /api/contents/CODEC_Test.ipynb?content=0&hash=0&1754927702498 (1818c910d95940398bc05336be593dcd@127.0.0.1) 1.50ms referer=http://localhost:8888/lab/tree/Test_On_New_MixFun_NeuralCodec.ipynb
+[W 2025-08-11 16:55:02.516 ServerApp] 404 GET /api/contents/CODEC_Test.ipynb?content=0&hash=0&1754927702498 (127.0.0.1): No such file or directory: CODEC_Test.ipynb
+[W 2025-08-11 16:55:02.518 ServerApp] 404 GET /api/contents/CODEC_Test.ipynb?content=0&hash=0&1754927702498 (1818c910d95940398bc05336be593dcd@127.0.0.1) 1.50ms referer=http://localhost:8888/lab/tree/Test_On_New_MixFun_NeuralCodec.ipynb
+[W 2025-08-11 16:55:02.518 ServerApp] 404 GET /api/contents/CODEC_Test.ipynb?content=0&hash=0&1754927702498 (127.0.0.1): No such file or directory: CODEC_Test.ipynb
+[W 2025-08-11 16:55:02.518 ServerApp] 404 GET /api/contents/Test_On_New_MixFun.ipynb?content=0&hash=0&1754927702498 (1818c910d95940398bc05336be593dcd@127.0.0.1) 1.82ms referer=http://localhost:8888/lab/tree/Test_On_New_MixFun_NeuralCodec.ipynb
+[W 2025-08-11 16:55:02.518 ServerApp] 404 GET /api/contents/Test_On_New_MixFun.ipynb?content=0&hash=0&1754927702498 (127.0.0.1): No such file or directory: Test_On_New_MixFun.ipynb
+[W 2025-08-11 16:55:02.519 ServerApp] 404 GET /api/contents/PPO_Trainning.ipynb?content=0&hash=0&1754927702498 (1818c910d95940398bc05336be593dcd@127.0.0.1) 0.67ms referer=http://localhost:8888/lab/tree/Test_On_New_MixFun_NeuralCodec.ipynb
+[W 2025-08-11 16:55:02.519 ServerApp] 404 GET /api/contents/PPO_Trainning.ipynb?content=0&hash=0&1754927702498 (127.0.0.1): No such file or directory: PPO_Trainning.ipynb
+[W 2025-08-11 16:55:02.521 ServerApp] 404 GET /api/contents/PPO_Trainning.ipynb?content=0&hash=0&1754927702498 (1818c910d95940398bc05336be593dcd@127.0.0.1) 1.36ms referer=http://localhost:8888/lab/tree/Test_On_New_MixFun_NeuralCodec.ipynb
+[W 2025-08-11 16:55:02.522 ServerApp] 404 GET /api/contents/PPO_Trainning.ipynb?content=0&hash=0&1754927702498 (127.0.0.1): No such file or directory: PPO_Trainning.ipynb
+[W 2025-08-11 16:55:02.524 ServerApp] 404 GET /api/contents/Test_On_New_MixFun.ipynb?content=0&hash=0&1754927702499 (1818c910d95940398bc05336be593dcd@127.0.0.1) 1.50ms referer=http://localhost:8888/lab/tree/Test_On_New_MixFun_NeuralCodec.ipynb
+[W 2025-08-11 16:55:02.524 ServerApp] 404 GET /api/contents/Test_On_New_MixFun.ipynb?content=0&hash=0&1754927702499 (127.0.0.1): No such file or directory: Test_On_New_MixFun.ipynb
+[W 2025-08-11 16:55:02.525 ServerApp] 404 GET /api/contents/Test_On_New_MixFun_AAC.ipynb?content=0&hash=0&1754927702499 (1818c910d95940398bc05336be593dcd@127.0.0.1) 1.96ms referer=http://localhost:8888/lab/tree/Test_On_New_MixFun_NeuralCodec.ipynb
+[W 2025-08-11 16:55:02.525 ServerApp] 404 GET /api/contents/Test_On_New_MixFun_AAC.ipynb?content=0&hash=0&1754927702499 (127.0.0.1): No such file or directory: Test_On_New_MixFun_AAC.ipynb
+[W 2025-08-11 16:55:02.525 ServerApp] 404 GET /api/contents/Test_On_New_MixFun_NeuralCodec.ipynb?content=0&hash=0&1754927702499 (1818c910d95940398bc05336be593dcd@127.0.0.1) 2.38ms referer=http://localhost:8888/lab/tree/Test_On_New_MixFun_NeuralCodec.ipynb
+[W 2025-08-11 16:55:02.526 ServerApp] 404 GET /api/contents/Test_On_New_MixFun_NeuralCodec.ipynb?content=0&hash=0&1754927702499 (127.0.0.1): No such file or directory: Test_On_New_MixFun_NeuralCodec.ipynb
+[W 2025-08-11 16:55:03.565 ServerApp] 404 GET /api/contents/Test_On_New_MixFun_NeuralCodec.ipynb?content=0&hash=0&1754927703561 (1818c910d95940398bc05336be593dcd@127.0.0.1) 0.73ms referer=http://localhost:8888/lab/tree/Test_On_New_MixFun_NeuralCodec.ipynb
+[W 2025-08-11 16:55:03.565 ServerApp] 404 GET /api/contents/Test_On_New_MixFun_NeuralCodec.ipynb?content=0&hash=0&1754927703561 (127.0.0.1): No such file or directory: Test_On_New_MixFun_NeuralCodec.ipynb
+[I 2025-08-11 16:55:21.158 ServerApp] Shutting down on /api/shutdown request.
+[I 2025-08-11 16:55:21.170 ServerApp] Shutting down 8 extensions
+[I 2025-08-12 12:14:58.909 ServerApp] jupyter_lsp | extension was successfully linked.
+[I 2025-08-12 12:14:58.911 ServerApp] jupyter_server_mathjax | extension was successfully linked.
+[I 2025-08-12 12:14:58.912 ServerApp] jupyter_server_terminals | extension was successfully linked.
+[I 2025-08-12 12:14:58.915 ServerApp] jupyterlab | extension was successfully linked.
+[I 2025-08-12 12:14:58.915 ServerApp] jupyterlab_git | extension was successfully linked.
+[I 2025-08-12 12:14:58.915 ServerApp] nbdime | extension was successfully linked.
+[E 2025-08-12 12:14:58.916 JupyterNotebookApp] Exception while loading config file /root/.jupyter/jupyter_notebook_config.py
+    Traceback (most recent call last):
+      File "/root/anaconda3/envs/codecbreak/lib/python3.10/site-packages/traitlets/config/application.py", line 915, in _load_config_files
+        config = loader.load_config()
+      File "/root/anaconda3/envs/codecbreak/lib/python3.10/site-packages/traitlets/config/loader.py", line 622, in load_config
+        self._read_file_as_dict()
+      File "/root/anaconda3/envs/codecbreak/lib/python3.10/site-packages/traitlets/config/loader.py", line 655, in _read_file_as_dict
+        exec(compile(f.read(), conf_filename, "exec"), namespace, namespace)  # noqa: S102
+      File "/root/.jupyter/jupyter_notebook_config.py", line 351
+        c.NotebookApp.ip = '0.0.0.0'
+    IndentationError: unexpected indent
+[W 2025-08-12 12:14:58.917 JupyterNotebookApp] 'password' has moved from NotebookApp to ServerApp. This config will be passed to ServerApp. Be sure to update your config before our next release.
+[W 2025-08-12 12:14:58.919 ServerApp] ServerApp.password config is deprecated in 2.0. Use PasswordIdentityProvider.hashed_password.
+[I 2025-08-12 12:14:58.919 ServerApp] notebook | extension was successfully linked.
+[I 2025-08-12 12:14:59.162 ServerApp] notebook_shim | extension was successfully linked.
+[I 2025-08-12 12:14:59.175 ServerApp] notebook_shim | extension was successfully loaded.
+[I 2025-08-12 12:14:59.176 ServerApp] jupyter_lsp | extension was successfully loaded.
+[I 2025-08-12 12:14:59.176 ServerApp] jupyter_server_mathjax | extension was successfully loaded.
+[I 2025-08-12 12:14:59.177 ServerApp] jupyter_server_terminals | extension was successfully loaded.
+[I 2025-08-12 12:14:59.185 LabApp] JupyterLab extension loaded from /root/anaconda3/envs/codecbreak/lib/python3.10/site-packages/jupyterlab
+[I 2025-08-12 12:14:59.185 LabApp] JupyterLab application directory is /root/anaconda3/envs/codecbreak/share/jupyter/lab
+[I 2025-08-12 12:14:59.186 LabApp] Extension Manager is 'pypi'.
+[I 2025-08-12 12:14:59.223 ServerApp] jupyterlab | extension was successfully loaded.
+[I 2025-08-12 12:14:59.225 ServerApp] jupyterlab_git | extension was successfully loaded.
+[I 2025-08-12 12:14:59.279 ServerApp] nbdime | extension was successfully loaded.
+[I 2025-08-12 12:14:59.281 ServerApp] notebook | extension was successfully loaded.
+[I 2025-08-12 12:14:59.282 ServerApp] Serving notebooks from local directory: /home/codecrack/CodecBreakerwithRL/CODECbreakCode
+[I 2025-08-12 12:14:59.282 ServerApp] Jupyter Server 2.16.0 is running at:
+[I 2025-08-12 12:14:59.282 ServerApp] http://SmallMONSTER:8888/lab
+[I 2025-08-12 12:14:59.282 ServerApp]     http://127.0.0.1:8888/lab
+[I 2025-08-12 12:14:59.282 ServerApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[I 2025-08-12 12:15:00.182 ServerApp] Skipped non-installed server(s): bash-language-server, dockerfile-language-server-nodejs, javascript-typescript-langserver, jedi-language-server, julia-language-server, pyright, python-language-server, python-lsp-server, r-languageserver, sql-language-server, texlab, typescript-language-server, unified-language-server, vscode-css-languageserver-bin, vscode-html-languageserver-bin, vscode-json-languageserver-bin, yaml-language-server
+[W 2025-08-12 12:15:06.225 LabApp] Could not determine jupyterlab build status without nodejs
+[W 2025-08-12 12:15:06.306 ServerApp] 404 GET /api/contents/CodecBreakerwithRL/Optimiser?content=0&hash=0&1754997306300 (1818c910d95940398bc05336be593dcd@127.0.0.1) 1.03ms referer=http://localhost:8888/lab/tree/CodecBreakerwithRL/Test_On_New_MixFun.ipynb
+[W 2025-08-12 12:15:06.306 ServerApp] 404 GET /api/contents/CodecBreakerwithRL/Optimiser?content=0&hash=0&1754997306300 (127.0.0.1): No such file or directory: CodecBreakerwithRL/Optimiser
+[W 2025-08-12 12:15:06.311 ServerApp] 404 GET /api/contents/CodecBreakerwithRL/Optimiser/config.py?content=0&hash=0&1754997306300 (1818c910d95940398bc05336be593dcd@127.0.0.1) 2.01ms referer=http://localhost:8888/lab/tree/CodecBreakerwithRL/Test_On_New_MixFun.ipynb
+[W 2025-08-12 12:15:06.312 ServerApp] 404 GET /api/contents/CodecBreakerwithRL/Optimiser/config.py?content=0&hash=0&1754997306300 (127.0.0.1): No such file or directory: CodecBreakerwithRL/Optimiser/config.py
+[W 2025-08-12 12:15:06.315 ServerApp] 404 GET /api/contents/CodecBreakerwithRL?content=0&hash=0&1754997306300 (1818c910d95940398bc05336be593dcd@127.0.0.1) 2.75ms referer=http://localhost:8888/lab/tree/CodecBreakerwithRL/Test_On_New_MixFun.ipynb
+[W 2025-08-12 12:15:06.315 ServerApp] 404 GET /api/contents/CodecBreakerwithRL?content=0&hash=0&1754997306300 (127.0.0.1): No such file or directory: CodecBreakerwithRL
+[W 2025-08-12 12:15:06.316 ServerApp] 404 GET /api/contents/CodecBreakerwithRL/Test_On_New_MixFun.ipynb?content=0&hash=0&1754997306300 (1818c910d95940398bc05336be593dcd@127.0.0.1) 3.46ms referer=http://localhost:8888/lab/tree/CodecBreakerwithRL/Test_On_New_MixFun.ipynb
+[W 2025-08-12 12:15:06.316 ServerApp] 404 GET /api/contents/CodecBreakerwithRL/Test_On_New_MixFun.ipynb?content=0&hash=0&1754997306300 (127.0.0.1): No such file or directory: CodecBreakerwithRL/Test_On_New_MixFun.ipynb
+[W 2025-08-12 12:15:06.317 ServerApp] 404 GET /api/contents/Jnotebook/HAAQI%20OPT?content=0&hash=0&1754997306301 (1818c910d95940398bc05336be593dcd@127.0.0.1) 4.16ms referer=http://localhost:8888/lab/tree/CodecBreakerwithRL/Test_On_New_MixFun.ipynb
+[W 2025-08-12 12:15:06.317 ServerApp] 404 GET /api/contents/Jnotebook/HAAQI%20OPT?content=0&hash=0&1754997306301 (127.0.0.1): No such file or directory: Jnotebook/HAAQI OPT
+[W 2025-08-12 12:15:06.318 ServerApp] 404 GET /api/contents/Jnotebook/HAAQI%20OPT/HAAQI_OPT.ipynb?content=0&hash=0&1754997306301 (1818c910d95940398bc05336be593dcd@127.0.0.1) 4.58ms referer=http://localhost:8888/lab/tree/CodecBreakerwithRL/Test_On_New_MixFun.ipynb
+[W 2025-08-12 12:15:06.318 ServerApp] 404 GET /api/contents/Jnotebook/HAAQI%20OPT/HAAQI_OPT.ipynb?content=0&hash=0&1754997306301 (127.0.0.1): No such file or directory: Jnotebook/HAAQI OPT/HAAQI_OPT.ipynb
+[W 2025-08-12 12:15:06.319 ServerApp] 404 GET /api/contents/Jnotebook?content=0&hash=0&1754997306301 (1818c910d95940398bc05336be593dcd@127.0.0.1) 5.34ms referer=http://localhost:8888/lab/tree/CodecBreakerwithRL/Test_On_New_MixFun.ipynb
+[W 2025-08-12 12:15:06.320 ServerApp] 404 GET /api/contents/Jnotebook?content=0&hash=0&1754997306301 (127.0.0.1): No such file or directory: Jnotebook
+[W 2025-08-12 12:15:06.321 ServerApp] 404 GET /api/contents/Jnotebook/AES_AILMA_Figure.1.%20Explain%20the%20mix%20loudness%20affection.ipynb?content=0&hash=0&1754997306301 (1818c910d95940398bc05336be593dcd@127.0.0.1) 0.91ms referer=http://localhost:8888/lab/tree/CodecBreakerwithRL/Test_On_New_MixFun.ipynb
+[W 2025-08-12 12:15:06.321 ServerApp] 404 GET /api/contents/Jnotebook/AES_AILMA_Figure.1.%20Explain%20the%20mix%20loudness%20affection.ipynb?content=0&hash=0&1754997306301 (127.0.0.1): No such file or directory: Jnotebook/AES_AILMA_Figure.1. Explain the mix loudness affection.ipynb
+[W 2025-08-12 12:15:06.323 ServerApp] 404 GET /api/contents/Jnotebook/HAAQI%20OPT/Untitled.ipynb?content=0&hash=0&1754997306302 (1818c910d95940398bc05336be593dcd@127.0.0.1) 0.78ms referer=http://localhost:8888/lab/tree/CodecBreakerwithRL/Test_On_New_MixFun.ipynb
+[W 2025-08-12 12:15:06.323 ServerApp] 404 GET /api/contents/Jnotebook/HAAQI%20OPT/Untitled.ipynb?content=0&hash=0&1754997306302 (127.0.0.1): No such file or directory: Jnotebook/HAAQI OPT/Untitled.ipynb
+[W 2025-08-12 12:15:06.331 ServerApp] 404 GET /api/contents/CodecBreakerwithRL/Optimiser/config.py?content=0&hash=0&1754997306302 (1818c910d95940398bc05336be593dcd@127.0.0.1) 4.61ms referer=http://localhost:8888/lab/tree/CodecBreakerwithRL/Test_On_New_MixFun.ipynb
+[W 2025-08-12 12:15:06.331 ServerApp] 404 GET /api/contents/CodecBreakerwithRL/Optimiser/config.py?content=0&hash=0&1754997306302 (127.0.0.1): No such file or directory: CodecBreakerwithRL/Optimiser/config.py
+[W 2025-08-12 12:15:06.335 ServerApp] 404 GET /api/contents/Jnotebook/HAAQI%20OPT/HAAQI_OPT.ipynb?content=0&hash=0&1754997306302 (1818c910d95940398bc05336be593dcd@127.0.0.1) 2.54ms referer=http://localhost:8888/lab/tree/CodecBreakerwithRL/Test_On_New_MixFun.ipynb
+[W 2025-08-12 12:15:06.335 ServerApp] 404 GET /api/contents/Jnotebook/HAAQI%20OPT/HAAQI_OPT.ipynb?content=0&hash=0&1754997306302 (127.0.0.1): No such file or directory: Jnotebook/HAAQI OPT/HAAQI_OPT.ipynb
+[W 2025-08-12 12:15:06.336 ServerApp] 404 GET /api/contents/Jnotebook/AES_AILMA_Figure.1.%20Explain%20the%20mix%20loudness%20affection.ipynb?content=0&hash=0&1754997306303 (1818c910d95940398bc05336be593dcd@127.0.0.1) 3.00ms referer=http://localhost:8888/lab/tree/CodecBreakerwithRL/Test_On_New_MixFun.ipynb
+[W 2025-08-12 12:15:06.336 ServerApp] 404 GET /api/contents/Jnotebook/AES_AILMA_Figure.1.%20Explain%20the%20mix%20loudness%20affection.ipynb?content=0&hash=0&1754997306303 (127.0.0.1): No such file or directory: Jnotebook/AES_AILMA_Figure.1. Explain the mix loudness affection.ipynb
+[W 2025-08-12 12:15:06.337 ServerApp] 404 GET /api/contents/CodecBreakerwithRL/Test_On_New_MixFun.ipynb?content=0&hash=0&1754997306303 (1818c910d95940398bc05336be593dcd@127.0.0.1) 3.42ms referer=http://localhost:8888/lab/tree/CodecBreakerwithRL/Test_On_New_MixFun.ipynb
+[W 2025-08-12 12:15:06.337 ServerApp] 404 GET /api/contents/CodecBreakerwithRL/Test_On_New_MixFun.ipynb?content=0&hash=0&1754997306303 (127.0.0.1): No such file or directory: CodecBreakerwithRL/Test_On_New_MixFun.ipynb
+[W 2025-08-12 12:15:10.537 ServerApp] 404 GET /api/contents/CodecBreakerwithRL/Test_On_New_MixFun.ipynb?content=0&hash=0&1754997310533 (1818c910d95940398bc05336be593dcd@127.0.0.1) 0.78ms referer=http://localhost:8888/lab/tree/CodecBreakerwithRL/Test_On_New_MixFun.ipynb
+[W 2025-08-12 12:15:10.537 ServerApp] 404 GET /api/contents/CodecBreakerwithRL/Test_On_New_MixFun.ipynb?content=0&hash=0&1754997310533 (127.0.0.1): No such file or directory: CodecBreakerwithRL/Test_On_New_MixFun.ipynb
+[I 2025-08-12 12:15:37.819 ServerApp] Shutting down on /api/shutdown request.
+[I 2025-08-12 12:15:37.829 ServerApp] Shutting down 8 extensions

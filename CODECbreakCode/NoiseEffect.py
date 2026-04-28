@@ -1,0 +1,269 @@
+from audiomentations import Gain,Limiter
+from CODECbreakCode.compressor_relative import Compressor
+import numpy as np
+from numpy.typing import NDArray
+from cylimiter import Limiter as CLimiter
+from CODECbreakCode import NoiseEval as NoiseEval
+from CODECbreakCode.add_hum_snr import AddHumSNR
+from CODECbreakCode.add_gaussian_snr import AddGaussianSNR
+
+
+def DropingSamplesByNum(samples,sample_rate  ,drop_samplenum):
+    '''The function for droping the samples by the number of drop time'''
+    ## adding certain random dropouts on the sample, the drop samplenum was pointed.
+    ## using np to setting the randomness on the samples''' 
+    if(drop_samplenum > 0):
+        num_samples = len(samples[0])
+        drop_indices = np.random.choice(num_samples,drop_samplenum,replace=False)
+        samples[0][drop_indices] = 0
+    return samples
+
+
+
+def DropingSamplesBySampleSizeAndNum(samples, sample_rate, drop_time,sampleSize=32):
+    '''The function for droping the random samples by the sample size and the number of drop time(occurences)'''
+    ##Because the Drop happen in most time by CPU is busy to handle the current runing clock by drop or throw a random number to sample;
+    ##therefroce by default the 32 samples is chosen, and drop time means how many drop happen in this transmission
+
+    if(drop_time > 0):
+        audio_signal = samples.copy()
+        print(f"There is {NoiseEval.count_zeros(audio_signal[0])} zero samples before")
+        num_samples = len(audio_signal[0])
+        num_packages = num_samples // sampleSize
+        print(f"There are {num_packages} packages")
+        if(drop_time >= num_samples):
+            raise ValueError(
+            "It is not possible set all the samples to zero"
+            )
+        drop_indices = np.random.choice(num_packages, drop_time, replace=False)
+            
+        for idx in drop_indices:
+            start_idx = idx * sampleSize
+            end_idx = min(start_idx + sampleSize, num_samples)  # Handle boundary conditions
+            audio_signal[0][start_idx:end_idx] = 0
+        print(f"There is {NoiseEval.count_zeros(audio_signal[0])} zero samples after")
+        return audio_signal
+    else:
+        return samples
+
+
+def DropingFixedSamplesBySampleSizeAndNum(samples, sample_rate, position, drop_time,sampleSize=32):
+    '''The function for droping the fixed samples happen position the sample size and the number of drop time(occurences)'''
+    if(drop_time > 0):
+        audio_signal = samples.copy()
+        print(f"There is {NoiseEval.count_zeros(audio_signal[0])} zero samples before")
+        num_samples = len(audio_signal[0])
+        num_packages = num_samples // sampleSize
+        print(f"There are {num_packages} packages")
+        if(drop_time >= num_samples):
+            raise ValueError(
+            "It is not possible set all the samples to zero"
+            )
+        drop_indices = position           
+        for idx in drop_indices:
+            start_idx = idx * sampleSize
+            end_idx = min(start_idx + sampleSize, num_samples)  # Handle boundary conditions
+            audio_signal[0][start_idx:end_idx] = 0
+        print(f"There is {NoiseEval.count_zeros(audio_signal[0])} zero samples after")
+        return audio_signal
+    else:
+        return samples
+
+
+def AddingHumNoise_Single(data,srate,manipulation_value):
+    '''The function for single audio track data to add the humming noise'''
+    if manipulation_value!= 0:
+        V_AddHumNoise_Transform = AddHumSNR(min_snr_db=manipulation_value,max_snr_db=manipulation_value,p=1.0)
+        data = V_AddHumNoise_Transform(data, sample_rate=srate)
+    return data,srate
+
+
+def AddingHummingNoise(vocal_data, drum_data, bass_data, other_data, srate, manipulation_list):
+    '''The function for multiple track data to add the gaussian noise'''
+    if manipulation_list[0]!= 0:
+        V_AddHumNoise_Transform = AddHumSNR(min_snr_db=manipulation_list[0],max_snr_db=manipulation_list[0],p=1.0)
+        vocal_data = V_AddHumNoise_Transform(vocal_data, sample_rate=srate)
+    if manipulation_list[1]!= 0:
+        D_AddHumNoise_Transform = AddHumSNR(min_snr_db=manipulation_list[1],max_snr_db=manipulation_list[1],p=1.0)
+        drum_data = D_AddHumNoise_Transform(drum_data, sample_rate=srate)
+    if manipulation_list[2]!= 0:
+        B_AddHumNoise_Transform = AddHumSNR(min_snr_db=manipulation_list[2],max_snr_db=manipulation_list[2],p=1.0)
+        bass_data = B_AddHumNoise_Transform(bass_data, sample_rate=srate)
+    if manipulation_list[3]!= 0:
+        O_AddHumNoise_Transform = AddHumSNR(min_snr_db=manipulation_list[3],max_snr_db=manipulation_list[3],p=1.0)
+        other_data = O_AddHumNoise_Transform(other_data, sample_rate=srate)
+    return vocal_data,drum_data,bass_data,other_data,srate
+
+
+def ClippingDistortionWithFloatingThreshold(samples, sample_rate, clipping_rate):
+    '''The function instead of the using AudioMentation, it is using the numpy to clip the samples'''
+    clipping_rate = round(clipping_rate, 1)
+    lower_percentile_threshold = clipping_rate / 2
+    lower_threshold, upper_threshold = np.percentile(
+            samples, [lower_percentile_threshold, 100 - lower_percentile_threshold]
+        )
+    samples = np.clip(samples, lower_threshold, upper_threshold)
+    return samples
+
+def ChangingGainByValue(vocal_data, drum_data, bass_data, other_data, srate, manipulation_list):
+    '''The function for multiple track data to change the gain by value'''
+    if manipulation_list[0]!= 0:
+        V_Gain_Transform = Gain(min_gain_in_db=manipulation_list[0],max_gain_in_db=manipulation_list[0],p=1.0)
+        vocal_data = V_Gain_Transform(vocal_data, sample_rate=srate)
+    if manipulation_list[1] != 0:
+        Drum_Gain_Transform = Gain(min_gain_db=manipulation_list[1],max_gain_db=manipulation_list[1],p=1.0)
+        drum_data = Drum_Gain_Transform(drum_data, sample_rate=srate)
+    if manipulation_list[2] != 0:
+        Bass_Gain_Transform = Gain(min_gain_db=manipulation_list[2],max_gain_db=manipulation_list[2],p=1.0)
+        bass_data = Bass_Gain_Transform(bass_data, sample_rate=srate)
+    if manipulation_list[3] != 0:
+        Other_Gain_Transform = Gain(min_gain_db=manipulation_list[3],max_gain_db=manipulation_list[3],p=1.0)
+        other_data = Other_Gain_Transform(other_data, sample_rate=srate)
+    return vocal_data,drum_data,bass_data,other_data,srate
+
+
+def AddingGaussianNoise_Single(data,srate,manipulation_value):
+    '''The function for single audio track data to add the gaussian noise'''
+    if manipulation_value!= 0:
+        V_AddGaussian_Transform = AddGaussianSNR(min_snr_db=manipulation_value,max_snr_db=manipulation_value,p=1.0)
+        data = V_AddGaussian_Transform(data, sample_rate=srate)
+    return data,srate
+    
+def AddingGaussianNoise(vocal_data, drum_data, bass_data, other_data, srate, manipulation_list):
+    '''The function for multiple track data to add the gaussian noise'''
+    if manipulation_list[0]!= 0:
+        V_AddGaussian_Transform = AddGaussianSNR(min_snr_db=manipulation_list[0],max_snr_db=manipulation_list[0],p=1.0)
+        vocal_data = V_AddGaussian_Transform(vocal_data, sample_rate=srate)
+    if manipulation_list[1]!= 0:
+        D_AddGaussian_Transform = AddGaussianSNR(min_snr_db=manipulation_list[1],max_snr_db=manipulation_list[1],p=1.0)
+        drum_data = D_AddGaussian_Transform(drum_data, sample_rate=srate)
+    if manipulation_list[2]!= 0:
+        B_AddGaussian_Transform = AddGaussianSNR(min_snr_db=manipulation_list[2],max_snr_db=manipulation_list[2],p=1.0)
+        bass_data = B_AddGaussian_Transform(bass_data, sample_rate=srate)
+    if manipulation_list[3]!= 0:
+        O_AddGaussian_Transform = AddGaussianSNR(min_snr_db=manipulation_list[3],max_snr_db=manipulation_list[3],p=1.0)
+        other_data = O_AddGaussian_Transform(other_data, sample_rate=srate)
+    return vocal_data,drum_data,bass_data,other_data,srate
+
+ 
+    
+
+def AddingClippingDistortionByFloater_Single(data,srate,manipulation_value):
+    '''The function for single audio track data to add the clipping distortion in floating data range'''
+    if manipulation_value!= 0:
+        data = ClippingDistortionWithFloatingThreshold(data, srate, manipulation_value)
+    return data,srate
+
+
+def AddingClippingDistortionWithFlatoing(vocal_data, drum_data, bass_data, other_data, srate, manipulation_list):
+    '''The function for multiple track data to add the clipping distortion in floating data range'''
+    if manipulation_list[0]!= 0:
+        vocal_data = ClippingDistortionWithFloatingThreshold(vocal_data, srate, manipulation_list[0])
+    if manipulation_list[1]!= 0:
+        drum_data = ClippingDistortionWithFloatingThreshold(drum_data, srate, manipulation_list[1])
+    if manipulation_list[2]!= 0:
+        bass_data = ClippingDistortionWithFloatingThreshold(bass_data, srate, manipulation_list[2])
+    if manipulation_list[3]!= 0:
+        other_data = ClippingDistortionWithFloatingThreshold(other_data, srate, manipulation_list[3])
+    return vocal_data,drum_data,bass_data,other_data,srate
+
+
+
+'''The class below is used to add the dynamic range compression, QMUL version'''
+def DynCompressor_Trans_FullPara(vocal_data, drum_data, bass_data, other_data, srate, manipulation_list):
+        v_param = manipulation_list[0:4]
+        d_param = manipulation_list[4:8]
+        b_param = manipulation_list[8:12]
+        o_param = manipulation_list[12:16]
+        makeup_gain=0.0
+        knee_width=1.0
+
+        if v_param is None or d_param is None or b_param is None or o_param is None:
+            raise ValueError("Missing compressor parameters.")
+       #     return null, srrate
+
+        for lst, indices in ((v_param, (1,2,3)), (d_param, (1,2,3)), (b_param, (1,2,3)), (o_param, (1,2,3))):
+            for i in indices:
+                lst[i] = lst[i] or 1
+
+        V_compressor = Compressor(threshold = v_param[0],ratio=v_param[1],attack=v_param[2],release=v_param[3],makeup_gain=makeup_gain,knee_width=knee_width,sample_rate=srate,)
+        vocal_data = V_compressor(vocal_data)
+        D_compressor = Compressor(threshold = d_param[0],ratio=d_param[1],attack=d_param[2],release=d_param[3],makeup_gain=makeup_gain,knee_width=knee_width,sample_rate=srate,)
+        drum_data = D_compressor(drum_data)
+        B_compressor = Compressor(threshold = b_param[0],ratio=b_param[1],attack=b_param[2],release=b_param[3],makeup_gain=makeup_gain,knee_width=knee_width,sample_rate=srate,)
+        bass_data = B_compressor(bass_data)
+        O_compressor = Compressor(threshold = o_param[0],ratio=o_param[1],attack=o_param[2],release=o_param[3],makeup_gain=makeup_gain,knee_width=knee_width,sample_rate=srate,)
+        other_data = O_compressor(other_data)
+        return vocal_data,drum_data,bass_data,other_data,srate
+
+'''The function below is used to add the dynamic range compression, QMUL version for single audio data'''
+def DynCompressor_Trans_FullPara_Single(audio_data, srate, manipulation_list):
+        param = manipulation_list
+        makeup_gain=0.0
+        knee_width=1.0
+
+        if param is None:
+            raise ValueError("Missing compressor parameters.")
+       #     return null, srrate
+
+        for i in (1, 2, 3):
+            param[i] = param[i] or 1
+
+        Audio_compressor = Compressor(threshold = param[0],ratio=param[1],attack=param[2],release=param[3],makeup_gain=makeup_gain,knee_width=knee_width,sample_rate=srate,)
+        audio_data = Audio_compressor(audio_data)
+
+        return audio_data,srate
+
+
+'''The function below is used to add the dynamic range compression(Limiter) for multiple track data'''
+def Dynamic_Transform_FullPara(vocal_data, drum_data, bass_data, other_data, srate, manipulation_list,attac_time=0.0003,reles_time=0.05):
+    '''The function for multiple track data to add the dynamic range compression(Limiter)'''
+    if manipulation_list[0]!= 0:
+        V_Dynammic_Transform = Limiter(min_threshold_db=-manipulation_list[0],max_threshold_db=-manipulation_list[0],min_attack=attac_time,max_attack=attac_time,min_release=reles_time,max_release=reles_time,threshold_mode="relative_to_signal_peak",p=1.0)
+        vocal_data = V_Dynammic_Transform(vocal_data, sample_rate=srate)
+    if manipulation_list[1]!= 0:
+        D_Dynammic_Transform = Limiter(min_threshold_db=-manipulation_list[1],max_threshold_db=-manipulation_list[1],min_attack=attac_time,max_attack=attac_time,min_release=reles_time,max_release=reles_time,threshold_mode="relative_to_signal_peak",p=1.0)
+        drum_data = D_Dynammic_Transform(drum_data, sample_rate=srate)
+    if manipulation_list[2]!= 0:
+        B_Dynammic_Transform = Limiter(min_threshold_db=-manipulation_list[2],max_threshold_db=-manipulation_list[2],min_attack=attac_time,max_attack=attac_time,min_release=reles_time,max_release=reles_time,threshold_mode="relative_to_signal_peak",p=1.0)
+        bass_data = B_Dynammic_Transform(bass_data, sample_rate=srate)
+    if manipulation_list[3]!= 0:
+        O_Dynammic_Transform = Limiter(min_threshold_db=-manipulation_list[3],max_threshold_db=-manipulation_list[3],min_attack=attac_time,max_attack=attac_time,min_release=reles_time,max_release=reles_time,threshold_mode="relative_to_signal_peak",p=1.0)
+        other_data = O_Dynammic_Transform(other_data, sample_rate=srate)
+    return vocal_data,drum_data,bass_data,other_data,srate
+
+'''The function below is used to add the dynamic range compression(Limiter) for single audio data'''
+def Dynamic_Transform_Single_FullPara(data,srate,thres_db,attac_time=0.0003,reles_time=0.05):
+    '''The function for single audio track data to add the dynamic range compression(Limiter)'''
+    if(thres_db != 0):
+        #Audio_Transform = Limiter(min_threshold_db=-thres_db,max_threshold_db=-thres_db,threshold_mode="relative_to_signal_peak",p=1.0)
+        Audiomentations_Transform = Limiter(min_threshold_db=-thres_db,max_threshold_db=-thres_db,min_attack=attac_time,max_attack=attac_time,min_release=reles_time,max_release=reles_time,threshold_mode="relative_to_signal_peak",p=1.0)
+#        Audiomentations_Transform = Limiter(min_threshold_db=-thres_db,max_threshold_db=-thres_db,min_attack=0.0005,max_attack=0.0005,min_release=0.05,max_release=0.05,threshold_mode="relative_to_signal_peak",p=1.0)
+        data = Audiomentations_Transform(data, sample_rate=srate)
+    return data,srate
+
+
+def Dynamic_FullPara_BClimiter(samples,srate,threshold_db,attack_seconds,release_seconds):
+    '''This Method Only using Test Climiter with out the Delay setting, For backup puyrpose less being used'''
+    print("Running Limiter")
+    attack = NoiseEval.convert_time_to_coefficient(
+        attack_seconds, srate
+    )
+    release = NoiseEval.convert_time_to_coefficient(
+        release_seconds, srate
+    )
+    # instead of delaying the signal by 60% of the attack time by default
+    delay = 1
+    #delay = max(round(0.6 * attack_seconds * srate), 1)
+    threshold_factor = NoiseEval.get_max_abs_amplitude(samples)
+    threshold_ratio  = threshold_factor * NoiseEval.convert_decibels_to_amplitude_ratio(threshold_db)
+    
+    #print(f"applied configuration attack:{attack},release:{release},threshold:{threshold_ratio},delay:{delay}")
+    limiter = CLimiter(
+        attack=attack,
+        release=release,
+        delay=delay,
+        threshold=threshold_ratio,
+    )
+    samples = limiter.limit(samples)
+    return samples,srate
