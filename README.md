@@ -1,4 +1,6 @@
-The CODE response to the paper [Effects of Production-Induced Audio Degradations on Conventional and Neural CODECs]
+The CODE response to the paper 
+
+[Effects of Production-Induced Audio Degradations on Conventional and Neural CODECs]
 
 The experiments figures and data are list in the related notebook. 
 
