@@ -9,3 +9,5 @@ If need the required the NMR test, the gstPEAQ is the current methods referring 
 https://github.com/HSU-ANT/gstpeaq
 
 The dataset of Experiment B is provided in the fold with the code for modeling.
+
+Root file included the configuration and mixing result with each CODEC and reference, Reggae track demonstrate as an example
